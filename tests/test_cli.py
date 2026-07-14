@@ -1,6 +1,8 @@
 import json
 from pathlib import Path
 
+import pytest
+
 from one_company_os.cli import main
 
 
@@ -90,4 +92,24 @@ def test_cli_returns_2_when_performance_is_not_an_object(
     assert error == {
         "error": "invalid_input",
         "message": "performance_by_account must be a JSON object",
+    }
+
+
+@pytest.mark.parametrize("non_finite", ["NaN", "Infinity", "-Infinity"])
+def test_cli_returns_2_for_non_finite_performance(
+    non_finite: str, tmp_path: Path, capsys
+) -> None:
+    payload = valid_payload()
+    payload["performance_by_account"] = {"1": non_finite}
+    input_path = tmp_path / "non-finite.json"
+    input_path.write_text(json.dumps(payload), encoding="utf-8")
+
+    assert main(["evaluate", "--input", str(input_path)]) == 2
+
+    captured = capsys.readouterr()
+    assert captured.out == ""
+    error = json.loads(captured.err)
+    assert error == {
+        "error": "invalid_input",
+        "message": "performance for account 1 must be finite",
     }

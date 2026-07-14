@@ -28,7 +28,11 @@ class PipelineDecision:
 
 
 ALLOWED_TRANSITIONS: dict[WorkflowState, set[WorkflowState]] = {
-    WorkflowState.NEW: {WorkflowState.VERIFYING, WorkflowState.MANUAL_QUEUE},
+    WorkflowState.NEW: {
+        WorkflowState.VERIFYING,
+        WorkflowState.RISK_PAUSED,
+        WorkflowState.MANUAL_QUEUE,
+    },
     WorkflowState.VERIFYING: {
         WorkflowState.SCORING,
         WorkflowState.RISK_PAUSED,
@@ -40,18 +44,31 @@ ALLOWED_TRANSITIONS: dict[WorkflowState, set[WorkflowState]] = {
         WorkflowState.DISCARDED,
         WorkflowState.RISK_PAUSED,
     },
-    WorkflowState.CANDIDATE: {WorkflowState.ASSIGNED, WorkflowState.DISCARDED},
+    WorkflowState.CANDIDATE: {
+        WorkflowState.ASSIGNED,
+        WorkflowState.RISK_PAUSED,
+        WorkflowState.DISCARDED,
+    },
     WorkflowState.ASSIGNED: {WorkflowState.MATERIAL_READY, WorkflowState.RISK_PAUSED},
-    WorkflowState.MATERIAL_READY: {WorkflowState.WRITING},
-    WorkflowState.WRITING: {WorkflowState.QUALITY_REVIEW, WorkflowState.MANUAL_QUEUE},
+    WorkflowState.MATERIAL_READY: {
+        WorkflowState.WRITING,
+        WorkflowState.RISK_PAUSED,
+    },
+    WorkflowState.WRITING: {
+        WorkflowState.QUALITY_REVIEW,
+        WorkflowState.RISK_PAUSED,
+        WorkflowState.MANUAL_QUEUE,
+    },
     WorkflowState.QUALITY_REVIEW: {
         WorkflowState.HUMAN_REVIEW,
         WorkflowState.WRITING,
+        WorkflowState.RISK_PAUSED,
         WorkflowState.DISCARDED,
     },
     WorkflowState.HUMAN_REVIEW: {
         WorkflowState.PUBLISHED,
         WorkflowState.WRITING,
+        WorkflowState.RISK_PAUSED,
         WorkflowState.DISCARDED,
     },
     WorkflowState.PUBLISHED: {WorkflowState.REVIEW_PENDING},
@@ -62,6 +79,7 @@ ALLOWED_TRANSITIONS: dict[WorkflowState, set[WorkflowState]] = {
     },
     WorkflowState.MANUAL_QUEUE: {
         WorkflowState.VERIFYING,
+        WorkflowState.RISK_PAUSED,
         WorkflowState.DISCARDED,
     },
     WorkflowState.DISCARDED: {WorkflowState.ARCHIVED},
@@ -92,7 +110,7 @@ def evaluate_hotspot(
             reasons=("duplicate_event",),
         )
 
-    risk = assess_risk(hotspot.risk_signals)
+    risk = assess_risk(hotspot.risk_signals, hotspot.sources)
     if risk.requires_human:
         return PipelineDecision(
             hotspot_id=hotspot.hotspot_id,

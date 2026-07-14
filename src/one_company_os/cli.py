@@ -4,6 +4,7 @@ import argparse
 from dataclasses import asdict
 from datetime import datetime
 import json
+from math import isfinite
 from pathlib import Path
 import sys
 from typing import Any
@@ -79,10 +80,13 @@ def main(argv: list[str] | None = None) -> int:
         performance_data = _require_object(
             payload.get("performance_by_account", {}), "performance_by_account"
         )
-        performance = {
-            int(key): float(value)
-            for key, value in performance_data.items()
-        }
+        performance: dict[int, float] = {}
+        for key, value in performance_data.items():
+            account_id = int(key)
+            account_performance = float(value)
+            if not isfinite(account_performance):
+                raise ValueError(f"performance for account {account_id} must be finite")
+            performance[account_id] = account_performance
         decision = evaluate_hotspot(hotspot, existing, performance)
     except (
         AttributeError,
