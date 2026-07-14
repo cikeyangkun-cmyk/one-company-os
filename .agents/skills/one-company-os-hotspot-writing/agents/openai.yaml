@@ -1,0 +1,4 @@
+interface:
+  display_name: "One Company OS Hotspot Writing"
+  short_description: "Score and route Toutiao hotspot articles"
+  default_prompt: "Evaluate this hotspot for the five-account matrix before drafting."
