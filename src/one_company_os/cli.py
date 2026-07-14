@@ -19,6 +19,12 @@ from .models import (
 from .pipeline import PipelineDecision, evaluate_hotspot
 
 
+def _require_object(value: object, name: str) -> dict[str, Any]:
+    if not isinstance(value, dict):
+        raise ValueError(f"{name} must be a JSON object")
+    return value
+
+
 def _parse_hotspot(data: dict[str, Any]) -> Hotspot:
     return Hotspot(
         hotspot_id=data["hotspot_id"],
@@ -64,15 +70,28 @@ def main(argv: list[str] | None = None) -> int:
     args = parser.parse_args(argv)
     try:
         raw = args.input.read_text(encoding="utf-8") if args.input else sys.stdin.read()
-        payload = json.loads(raw)
-        hotspot = _parse_hotspot(payload["hotspot"])
-        existing = tuple(_parse_hotspot(item) for item in payload.get("existing", []))
+        payload = _require_object(json.loads(raw), "input")
+        hotspot = _parse_hotspot(_require_object(payload["hotspot"], "hotspot"))
+        existing = tuple(
+            _parse_hotspot(_require_object(item, "existing item"))
+            for item in payload.get("existing", [])
+        )
+        performance_data = _require_object(
+            payload.get("performance_by_account", {}), "performance_by_account"
+        )
         performance = {
             int(key): float(value)
-            for key, value in payload.get("performance_by_account", {}).items()
+            for key, value in performance_data.items()
         }
         decision = evaluate_hotspot(hotspot, existing, performance)
-    except (KeyError, TypeError, ValueError, json.JSONDecodeError) as exc:
+    except (
+        AttributeError,
+        KeyError,
+        OSError,
+        OverflowError,
+        TypeError,
+        ValueError,
+    ) as exc:
         print(
             json.dumps(
                 {"error": "invalid_input", "message": str(exc)},

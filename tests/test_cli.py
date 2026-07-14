@@ -60,3 +60,34 @@ def test_cli_returns_2_for_invalid_input(tmp_path: Path, capsys) -> None:
     error = json.loads(capsys.readouterr().err)
     assert error["error"] == "invalid_input"
     assert "hotspot_id" in error["message"]
+
+
+def test_cli_returns_2_when_input_file_is_missing(tmp_path: Path, capsys) -> None:
+    input_path = tmp_path / "missing.json"
+
+    assert main(["evaluate", "--input", str(input_path)]) == 2
+
+    captured = capsys.readouterr()
+    assert captured.out == ""
+    error = json.loads(captured.err)
+    assert error["error"] == "invalid_input"
+    assert str(input_path) in error["message"]
+
+
+def test_cli_returns_2_when_performance_is_not_an_object(
+    tmp_path: Path, capsys
+) -> None:
+    payload = valid_payload()
+    payload["performance_by_account"] = []
+    input_path = tmp_path / "bad-shape.json"
+    input_path.write_text(json.dumps(payload), encoding="utf-8")
+
+    assert main(["evaluate", "--input", str(input_path)]) == 2
+
+    captured = capsys.readouterr()
+    assert captured.out == ""
+    error = json.loads(captured.err)
+    assert error == {
+        "error": "invalid_input",
+        "message": "performance_by_account must be a JSON object",
+    }
