@@ -46,3 +46,9 @@ def test_distinct_event_is_not_duplicate() -> None:
     existing = make_hotspot("event-1", "老人看牙遭全口拔光医院被处罚")
     candidate = make_hotspot("event-2", "多地公布养老金调整方案")
     assert find_duplicate(candidate, (existing,)) is None
+
+
+def test_empty_normalized_titles_with_different_ids_are_not_duplicates() -> None:
+    existing = make_hotspot("event-1", "!!!")
+    candidate = make_hotspot("event-2", "🔥")
+    assert find_duplicate(candidate, (existing,)) is None

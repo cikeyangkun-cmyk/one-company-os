@@ -18,9 +18,11 @@ def find_duplicate(
     for item in existing:
         if item.hotspot_id == candidate.hotspot_id:
             return item
-        ratio = SequenceMatcher(
-            None, candidate_title, normalize_title(item.title)
-        ).ratio()
-        if ratio >= threshold:
+        item_title = normalize_title(item.title)
+        if (
+            candidate_title
+            and item_title
+            and SequenceMatcher(None, candidate_title, item_title).ratio() >= threshold
+        ):
             return item
     return None
