@@ -36,9 +36,11 @@ def build_rewrite_prompt(title: str, text: str, style: str = "wechat") -> str:
 async def rewrite_article(title: str, text: str, style: str = "wechat") -> dict:
     api_key = os.getenv("LLM_API_KEY") or os.getenv("OPENAI_API_KEY")
     base_url = os.getenv("LLM_BASE_URL", "https://api.openai.com/v1")
-    model = os.getenv("LLM_MODEL", "gpt-5.6")
+    model = os.getenv("LLM_MODEL")
     if not api_key:
         raise RuntimeError("未配置 LLM_API_KEY / OPENAI_API_KEY")
+    if not model:
+        raise RuntimeError("未配置 LLM_MODEL")
 
     prompt = build_rewrite_prompt(title, text, style)
     payload = {
