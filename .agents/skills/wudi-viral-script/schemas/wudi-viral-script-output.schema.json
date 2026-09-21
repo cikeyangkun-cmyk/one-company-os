@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://one-company-os.local/schemas/wudi-viral-script-output.schema.json",
+  "title": "Wudi Viral Script Output",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["topic_analysis", "angles", "hooks", "recommended_direction", "script", "douyin_version", "wechat_video_version", "shooting", "package", "viral_score", "missing_material"],
+  "properties": {
+    "topic_analysis": {"type":"object","additionalProperties":false,"required":["core_conflict","target_audience","audience_interest","wudi_authority","risk"],"properties":{"core_conflict":{"type":"string"},"target_audience":{"type":"string"},"audience_interest":{"type":"string"},"wudi_authority":{"type":"string"},"risk":{"type":"string"}}},
+    "angles": {"type":"array","minItems":3,"maxItems":5,"items":{"type":"object","additionalProperties":false,"required":["name","type","core_idea","reason"],"properties":{"name":{"type":"string"},"type":{"type":"string","enum":["industry_insight","boss_viewpoint","real_experience","customer_pain","contrarian_conflict"]},"core_idea":{"type":"string"},"reason":{"type":"string"}}}},
+    "hooks": {"type":"array","minItems":6,"items":{"type":"object","additionalProperties":false,"required":["type","spoken","visual","screen_text"],"properties":{"type":{"type":"string"},"spoken":{"type":"string"},"visual":{"type":"string"},"screen_text":{"type":"string"}}}},
+    "recommended_direction": {"type":"string"},
+    "script": {"type":"object","additionalProperties":false,"required":["conflict_hook","stance","real_story","insight","viewpoint","ending"],"properties":{"conflict_hook":{"type":"string"},"stance":{"type":"string"},"real_story":{"type":"string"},"insight":{"type":"string"},"viewpoint":{"type":"string"},"ending":{"type":"string"}}},
+    "douyin_version": {"type":"string"},
+    "wechat_video_version": {"type":"string"},
+    "shooting": {"type":"object","additionalProperties":false,"required":["opening_frame","location","camera","b_roll","subtitle_notes"],"properties":{"opening_frame":{"type":"string"},"location":{"type":"string"},"camera":{"type":"string"},"b_roll":{"type":"array","items":{"type":"string"}},"subtitle_notes":{"type":"string"}}},
+    "package": {"type":"object","additionalProperties":false,"required":["titles","cover_text","publish_caption","comment_prompt"],"properties":{"titles":{"type":"array","minItems":3,"items":{"type":"string"}},"cover_text":{"type":"array","minItems":3,"items":{"type":"string"}},"publish_caption":{"type":"string"},"comment_prompt":{"type":"string"}}},
+    "viral_score": {"type":"object","additionalProperties":false,"required":["hook","tension","persona","authenticity","insight","spoken_language","comment_potential","total","classification","deductions"],"properties":{"hook":{"type":"integer","minimum":0,"maximum":20},"tension":{"type":"integer","minimum":0,"maximum":15},"persona":{"type":"integer","minimum":0,"maximum":15},"authenticity":{"type":"integer","minimum":0,"maximum":15},"insight":{"type":"integer","minimum":0,"maximum":15},"spoken_language":{"type":"integer","minimum":0,"maximum":10},"comment_potential":{"type":"integer","minimum":0,"maximum":10},"total":{"type":"integer","minimum":0,"maximum":100},"classification":{"type":"string","enum":["reject","rewrite","candidate","priority_candidate","strong_candidate"]},"deductions":{"type":"array","items":{"type":"string"}}}},
+    "missing_material": {"type":"array","items":{"type":"string"}}
+  }
+}
