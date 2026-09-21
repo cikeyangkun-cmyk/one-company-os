@@ -1,0 +1,4 @@
+interface:
+  display_name: "Wudi Viral Script"
+  short_description: "Turn 吴迪 topics into shoot-ready viral-structure scripts"
+  default_prompt: "Turn this 吴迪 topic into a truthful Douyin-first script with multiple angles, three-layer hooks, the six-part 吴迪 structure, platform adaptation, shooting notes, and a scored review."
